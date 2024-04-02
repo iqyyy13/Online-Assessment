@@ -36,3 +36,131 @@
     transform: rotate(360deg);
   }
 }
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #333;
+}
+
+.rectangle{
+  padding: 10px 20px;
+  border-radius: 10px;
+  width: 400px;
+  height: 100px;
+  background-color: rgb(5, 56, 75);
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.rectangle input[type="text"] {
+  margin-top: 40px;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 24px;
+  width: 50%;
+  text-align: left;
+}
+
+.swap-button{
+  margin-bottom: 50px;
+  margin-right: 350px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.swap-button:hover{
+  background-color: #0056b3;
+}
+
+.pay{
+  position: absolute;
+}
+
+.label{
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background-color: rgb(5, 56, 75);
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.input-wrapper{
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input[type="text"]{
+  border: none;
+  background: none;
+  color: white;
+  font-size: 16px;
+  width: 80%;
+  text-align: center;
+}
+
+.input-wrapper select {
+  margin-left: 10px;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 16px;
+}
+
+.arrow-icon{
+  position: absolute;
+  top: calc(50% + 25px);
+  left: calc(50% - 12px);
+  color: white;
+  font-size: 24px;
+  z-index: 1;
+}
+
+.arrow-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: absolute;
+  top: calc(50% - 25px);
+  left: calc(50% -12px);
+}
+
+.custom-select{
+  margin-left: 500px;
+  min-width: 50px;
+}
+
+.connect-wallet-button{
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  background-color: purple;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.pane-rectangle{
+  margin-top: 20px;
+  width: 200px;
+  height: 25px;
+  background-color: black;
+  color: red;
+  border-radius: 10px;
+  padding: 20px;
+}

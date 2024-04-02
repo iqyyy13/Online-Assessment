@@ -1,4 +1,14 @@
 import './App.css';
+import React, { useState } from 'react';
+import { FaArrowAltCircleDown, FaUser } from 'react-icons/fa';
+import Select from 'react-select'
+import TokenSwap from './components/TokenSwap';
+import Etherium from './components/Etherium';
+import Luna from './components/Luna';
+import OKB from './components/OKB';
+
+import SlidingPane from "react-sliding-pane"
+import "react-sliding-pane/dist/react-sliding-pane.css";
 
 const jsonData = 
 [
@@ -40,22 +50,175 @@ const jsonData =
     {"currency":"ZIL","date":"2023-08-29T07:10:50.000Z","price":0.01651813559322034}
 ]
 
+const options = [
+  {value: 'LUNA', label: 'Luna', icon: <Luna/>},
+  {value: 'ETH', label: 'Etherium', icon: <Etherium/>},
+  {value: 'OKB', label: 'OKB', icon: <OKB/>},
+]
+
+const cryptoPrices = {
+  ETH: 1645.93,
+  LUNA: 0.41,
+  OKB: 42.98,
+};
+
+const CustomOption = ({data, innerRef, innerProps, isFocused}) => (
+  <div
+    ref = {innerRef}
+    {...innerProps}
+    style = {{
+      backgroundColor: isFocused ? 'lightblue' : 'white',
+      padding: "5px"
+    }}
+  >
+    {data.icon} {data.label}
+  </div>
+);
+
+const CustomSingleValue = ({data}) => (
+  data ? (
+    <div style = {{display: 'flex', alignItems: 'center', marginTop: '-30px'}}>
+      {data.icon}
+      <span style={{marginLeft:'5px'}}>{data.label}</span>
+    </div>
+  ) : null
+);
+
+const Selector = ({id, selectedOption, setSelectedOption}) => {
+  const handleChange = (selectedOption) => {
+    setSelectedOption(selectedOption);
+  };
+
+  return (
+    <Select
+      options={options}
+      value={selectedOption}
+      onChange={handleChange}
+      placeholder={`Select option for Selector ${id}`}
+    />
+  );
+};
+
 function App() {
-    return (
-      <div>
-        <h1>Currency Exchange Rates</h1>
-        <ul>
-          {jsonData.map((item, index) => (
-            <li key={index}>
-              <p>Currency: {item.currency}</p>
-              <p>Date: {new Date(item.date).toLocaleString()}</p>
-              <p>Price: {item.price}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
+  const [selectedOption1, setSelectedOption1] = useState(null);
+  const [selectedOption2, setSelectedOption2] = useState(null);
+  const [price1, setPrice1] = useState(1);
+  const [price2, setPrice2] = useState(1);
+  const [userInput1, setUserInput1] = useState('');
+  const [userInput2, setUserInput2] = useState('');
+  const [isSwapMode, setIsSwapMode] = useState('');
+
+  const [state, setState] = useState({
+    isScreenOpen: false,
+  });
+
+  const handleSelector1Change = (selectedOption) => {
+    setSelectedOption1(selectedOption);
+    if(selectedOption && selectedOption.value === selectedOption2?.value) {
+      setSelectedOption2(null);
+    }
+    setPrice1(selectedOption ? cryptoPrices[selectedOption.value] : 1);
+  };
+
+  const handleSelector2Change = (selectedOption) => {
+    setSelectedOption2(selectedOption);
+    if(selectedOption && selectedOption.value === selectedOption1?.value) {
+      setSelectedOption1(null);
+    }
+    setPrice2(selectedOption ? cryptoPrices[selectedOption.value] : 1);
+  };
+
+  const handleSwap = () => {
+    const tempOption = selectedOption1;
+    setSelectedOption1(selectedOption2);
+    setSelectedOption2(tempOption);
   }
+
+  const getInputLabelText = () => {
+    return isSwapMode ? 'You receive' : 'You pay';
+  }
+
+  const handleInputChange1 = (event) => {
+    setUserInput1(event.target.value);
+  }
+
+  const handleInputChange2 = (event) => {
+    setUserInput2(event.target.value);
+  }
+
+  const amount1 = userInput1 * price1
+  const amount2 = userInput2 * price2
+
+  return (
+    <div className='container'>
+      <button className='swap-button'>Swap</button>
+      <div className='rectangle'>
+        <span className='label'>You pay</span>
+        <input 
+          type = "text" 
+          placeholder='0'
+          value={userInput1}
+          onChange={handleInputChange1}
+        />
+        <div style ={{ opacity: '0.7', marginTop: '10px', color: 'white'}} > {userInput1 ? userInput1 * price1 : ''} </div>
+        <div style = {{width:'175px', marginLeft: '235px', marginTop: '-65px' }}>
+          <Select 
+            options={options}
+            value={selectedOption1}
+            onChange={handleSelector1Change}
+            components={{Option: CustomOption, SingleValue: CustomSingleValue}}
+            placeholder="Select an option"
+          />
+        </div>
+      </div>
+      <button className='arrow-button' onClick={handleSwap}>
+        <FaArrowAltCircleDown className='arrow-icon'/>
+      </button>
+      <div className='rectangle'>
+        <span className='label'>You receive</span>
+        <input 
+          type = "text" 
+          placeholder='0'
+          value={userInput1 ? (userInput1 * price1 / price2).toFixed(4) : ''}
+          readOnly
+        />
+        <div style ={{ opacity: '0.7', marginTop: '10px', color: 'white'}} > {userInput1 ? userInput1 * price1 : ''} </div>
+        <div style = {{width:'175px', marginLeft: '235px', marginTop: '-65px'}}>
+          <Select
+            options = {options}
+            value={selectedOption2}
+            onChange={handleSelector2Change}
+            components={{Option: CustomOption, SingleValue:CustomSingleValue}}
+            placeholder="Select an option"
+          />
+        </div>
+      </div>
+      <div className='connect-wallet-button'>
+        <button className='connect-wallet-button' onClick={() => setState({isScreenOpen:true})}>
+          Connect Wallet
+        </button>
+        <SlidingPane
+          className='some-custom-class'
+          overlayClassName='some-custom-overlay-class'
+          isOpen={state.isScreenOpen}
+          title="Connect a wallet"
+          width = '25%'
+          onRequestClose={() => {
+            setState({isScreenOpen:false});
+          }}
+        >
+          <div> And I am pane content. </div>
+          <div className='pane-rectangle'>
+            <span className='title'>WOOHOO</span>
+          </div>
+          
+          <br />
+          <img src="img.png"/>
+        </SlidingPane>
+      </div>
+    </div>
+  );
+}
 
 export default App;
 
