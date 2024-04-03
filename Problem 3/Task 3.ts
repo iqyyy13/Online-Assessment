@@ -1,33 +1,57 @@
-import React from "react"
+import React, {useEffect, useState, useMemo} from "react"
 
 interface WalletBalance 
 {
   currency: string;
   amount: number;
+  blockchain: string; //Added missing field
 }
 
-interface FormattedWalletBalance
+interface FormattedWalletBalance extends WalletBalance //since they use the same properties
 {
-  currency: string;
-  amount: number;
   formatted: string;
 }
 
 class Datasource 
 {
   // TODO: Implement datasource class
+  url: string;
+
+  constructor(url: string){
+    this.url = url;
+  }
+
+  async getPrices() : Promise<{ [currency: string]: number}> {
+    try{
+      const response = await fetch(this.url)
+      const data = await response.json();
+      return data;
+    } catch (e)
+    {
+      console.error(e);
+      return {};
+    }
+  }
 }
 
 interface Props 
 {
   children?: React.ReactNode;
-
 }
+
+const WalletRow: React.FC<any> = ({formattedAmount, usdValue}) => {
+  return (
+    <div>
+      <span>{formattedAmount}</span>
+      <span>{usdValue}</span>
+    </div>
+  );
+};
 
 //import React
 const WalletPage: React.FC<Props> = (props) => {
   const {children, ...rest } = props;
-  const balances = useWalletBalances();
+  const balances = WalletBalance[] = [];
 	const [prices, setPrices] = useState({});
 
   useEffect(() => {
@@ -35,7 +59,7 @@ const WalletPage: React.FC<Props> = (props) => {
     datasource.getPrices().then(prices => {
       setPrices(prices);
     }).catch(error => {
-      console.err(error);
+      console.error(error); //err -> error
     });
   }, []);
 
@@ -59,7 +83,7 @@ const WalletPage: React.FC<Props> = (props) => {
   const sortedBalances = useMemo(() => {
     return balances.filter((balance: WalletBalance) => {
 		  const balancePriority = getPriority(balance.blockchain);
-		  if (lhsPriority > -99) {
+		  if (balancePriority > -99 && balance.amount <= 0) {  //modified if statement
 		     if (balance.amount <= 0) {
 		       return true;
 		     }
@@ -87,14 +111,13 @@ const WalletPage: React.FC<Props> = (props) => {
     const usdValue = prices[balance.currency] * balance.amount;
     return (
       <WalletRow 
-        className={classes.row}
-        key={index}
-        amount={balance.amount}
+        className = "row"
+        key = {index}
         usdValue={usdValue}
         formattedAmount={balance.formatted}
       />
-    )
-  })
+    );
+  });
 
   return (
     <div {...rest}>
@@ -102,3 +125,5 @@ const WalletPage: React.FC<Props> = (props) => {
     </div>
   );
 };
+
+export default WalletPage;
